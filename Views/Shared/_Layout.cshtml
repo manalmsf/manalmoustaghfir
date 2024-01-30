@@ -1,0 +1,72 @@
+﻿@model ProductDisplayModel
+@{
+
+}
+<div class="my-2">
+    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
+
+        <div class="col-12">
+            <label class="visually-hidden" for="categoryId">Categories</label>
+            <select class="form-select" id="categoryId" name="categoryId">
+                <option selected>Choose...</option>
+                @foreach (var cat in Model.Categories)
+                {
+                    <option selected="@(cat.Id == Model.CategorieId)" value="@cat.Id">@cat.CategorieName</option>
+                }
+
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="visually-hidden" for="sterm">Chercher Par Nom</label>
+            <div class="input-group">
+                <div class="input-group-text"></div>
+                <input type="text" class="form-control" value="@Model.sTerm" id="sterm" name="sterm" placeholder="Chercher par Nom">
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Chercher</button>
+            <a href="/Home" class="btn btn-dark">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="w-100  mt-4 d-flex flex-wrap">
+    @foreach (var prod in Model.Products)
+    {
+        <div class="card mx-2 mb-4" style="width: 16rem;">
+            <img style="width:100%;height:300px" src="images/@prod.Image" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">@prod.ProductName</h5>
+                <p class="card-text">
+                    <b>Categorie:</b>@prod.CategorieName<br />
+                    <b>Prix:</b>@prod.Price MAD
+                </p>
+                <button type="button" onclick="add(@prod.Id)" class="btn btn-primary">Ajouter Au Panier</button>
+            </div>
+        </div>
+    }
+</div>
+@section Scripts {
+    <script>
+        async function add(productId) {
+            var usernameEl = document.getElementById("username");
+            if (usernameEl == null) {
+                window.location.href = "/Identity/Account/Login";
+            }
+            try {
+                var response = await fetch(`/Cart/AddItem?productId=${productId}`);
+                if (response.status == 200) {
+                    var result = await response.json();
+                    var cartCountEl = document.getElementById("cartCount");
+                    cartCountEl.innerHTML = result;
+                    window.location.href = "#cartCount";
+                }
+            }
+
+            catch (err) {
+                console.log(err);
+            }
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+}
