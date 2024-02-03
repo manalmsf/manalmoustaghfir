@@ -1,72 +1,68 @@
-﻿@model ProductDisplayModel
-@{
-
-}
-<div class="my-2">
-    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
-
-        <div class="col-12">
-            <label class="visually-hidden" for="categoryId">Categories</label>
-            <select class="form-select" id="categoryId" name="categoryId">
-                <option selected>Choose...</option>
-                @foreach (var cat in Model.Categories)
-                {
-                    <option selected="@(cat.Id == Model.CategorieId)" value="@cat.Id">@cat.CategorieName</option>
-                }
-
-            </select>
-        </div>
-        <div class="col-12">
-            <label class="visually-hidden" for="sterm">Chercher Par Nom</label>
-            <div class="input-group">
-                <div class="input-group-text"></div>
-                <input type="text" class="form-control" value="@Model.sTerm" id="sterm" name="sterm" placeholder="Chercher par Nom">
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SITE PRODUITS</title>
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/Home">OUR BIGSTORE</a> 
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/Home/Index">
+                            Home
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/Privacy">Privacy</a>
+                    </li>
+                    @*@ <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Separated link</a>
+                        </div>
+                    </li>*@
+                </ul>
+                <partial name ="_LoginPartial" />
             </div>
         </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Chercher</button>
-            <a href="/Home" class="btn btn-dark">Reset</a>
-        </div>
-    </form>
-</div>
+    </nav>
+    <div class="container">
+        @RenderBody()
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
-<div class="w-100  mt-4 d-flex flex-wrap">
-    @foreach (var prod in Model.Products)
-    {
-        <div class="card mx-2 mb-4" style="width: 16rem;">
-            <img style="width:100%;height:300px" src="images/@prod.Image" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">@prod.ProductName</h5>
-                <p class="card-text">
-                    <b>Categorie:</b>@prod.CategorieName<br />
-                    <b>Prix:</b>@prod.Price MAD
-                </p>
-                <button type="button" onclick="add(@prod.Id)" class="btn btn-primary">Ajouter Au Panier</button>
-            </div>
-        </div>
-    }
-</div>
-@section Scripts {
-    <script>
-        async function add(productId) {
-            var usernameEl = document.getElementById("username");
-            if (usernameEl == null) {
-                window.location.href = "/Identity/Account/Login";
-            }
-            try {
-                var response = await fetch(`/Cart/AddItem?productId=${productId}`);
-                if (response.status == 200) {
-                    var result = await response.json();
-                    var cartCountEl = document.getElementById("cartCount");
-                    cartCountEl.innerHTML = result;
-                    window.location.href = "#cartCount";
-                }
-            }
-
-            catch (err) {
-                console.log(err);
+<script>
+    loadCartCount();
+    async function loadCartCount() {
+        var usernameEl=document.getElementById("username")
+        try {
+            var response = await fetch(`/Cart/GetTotalItemInCart`);
+            console.log(response)
+            if (response.status == 200) {
+                var result = await response.json();
+                var cartCountEl = document.getElementById("cartCount");
+                cartCountEl.innerHTML = result;
             }
         }
-    </script>
-    @RenderSection("Scripts", required: false)
-}
+        catch (err) {
+            console.log(err);
+        }
+    }
+</script>
+</html>
+@await RenderSectionAsync("Scripts", required: false)
